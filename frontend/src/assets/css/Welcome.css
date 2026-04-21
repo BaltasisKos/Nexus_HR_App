@@ -1,0 +1,62 @@
+/* src/assets/css/Welcome.css */
+.welcome-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f8fafc;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.welcome-card {
+    background: #ffffff;
+    padding: 3rem 2rem;
+    border-radius: 24px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+}
+
+.welcome-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    display: block;
+}
+
+.welcome-title {
+    font-size: 2rem;
+    color: #0f172a;
+    margin-bottom: 1rem;
+    font-weight: 800;
+}
+
+.welcome-text {
+    font-size: 1.1rem;
+    color: #475569;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+}
+
+.start-button {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 1.1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.start-button:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+.start-button:active {
+    transform: translateY(0);
+}
