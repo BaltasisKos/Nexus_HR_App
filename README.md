@@ -1,6 +1,6 @@
 # 🌐 Nexus HR | Talent Synergy & Team Architect
 
-**Nexus HR** is a high-performance Human Capital Management (HCM) engine designed to transform individual potential into collective excellence. By leveraging the **CliftonStrengths (Gallup)** framework, it provides HR professionals and team leads with the data-driven insights needed to architect synchronized, high-performing teams.
+**Nexus HR** is a high-performance Human Capital Management (HCM) engine designed to transform individual potential into collective excellence. It provides HR professionals and team leads with the data-driven insights needed to architect synchronized, high-performing teams.
 
 ---
 
