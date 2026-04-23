@@ -30,6 +30,13 @@
     margin-bottom: 2rem;
 }
 
+.login-form-minimal {
+    margin-top: 80px; /* Αυξάνεις την τιμή ανάλογα με το πόσο κάτω το θέλεις */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Απόσταση μεταξύ των πεδίων */
+}
+
 .login-form {
     display: flex;
     flex-direction: column;

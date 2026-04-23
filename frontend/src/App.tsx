@@ -1,73 +1,69 @@
 // src/App.tsx
 import React, { useState } from 'react';
 import Welcome from './components/Welcome';
-import Login from './components/Login';
-import Quiz from './components/Quiz'; // Προσοχή στο κεφαλαίο Q
+import Quiz from './components/Quiz';
+import Results from './components/Results';
 import axios from 'axios';
 import { UserData, Strength } from './types';
-import Results from './components/Results';
 
-type Step = 'welcome' | 'login' | 'quiz' | 'results';
+// Αφαιρέσαμε το 'login' step αφού είναι πλέον μέσα στο Welcome
+type Step = 'welcome' | 'quiz' | 'results';
 
 const App: React.FC = () => {
     const [step, setStep] = useState<Step>('welcome');
     const [user, setUser] = useState<UserData | null>(null);
     const [results, setResults] = useState<Strength[]>([]);
 
-    const handleLogin = (data: UserData) => {
+    // Αυτή η συνάρτηση καλείται όταν πατηθεί το "Start" στο 3ο slide του Welcome
+    const handleStartQuiz = (data: UserData) => {
         setUser(data);
         setStep('quiz');
     };
 
-
     const handleQuizComplete = async (finalAnswers: Record<number, [number, number]>) => {
-    try {
-        const payload = {
-            username: user?.username,
-            age: user?.age,
-            gender: user?.gender,
-            answers: finalAnswers
-        };
+        try {
+            const payload = {
+                username: user?.username,
+                age: user?.age,
+                gender: user?.gender,
+                answers: finalAnswers
+            };
 
-        const response = await axios.post('http://localhost:5000/api/submit', payload, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        setResults(response.data.top_5);
-        setStep('results');
-    } catch (error) {
-        console.error("Error submitting quiz:", error);
-        alert("Κάτι πήγε λάθος με την αποστολή των αποτελεσμάτων.");
-    }
-};
+            // Κλήση στο Python Backend (Flask/FastAPI)
+            const response = await axios.post('http://localhost:5000/api/submit', payload, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            setResults(response.data.top_5);
+            setStep('results');
+        } catch (error) {
+            console.error("Error submitting quiz:", error);
+            alert("Κάτι πήγε λάθος με την αποστολή των αποτελεσμάτων.");
+        }
+    };
 
     return (
         <div className="App">
-            {/* 1. Αρχική Σελίδα */}
+            {/* 1. Αρχική Σελίδα (Περιλαμβάνει πλέον και τη φόρμα στο 3ο slide) */}
             {step === 'welcome' && (
-                <Welcome onStart={() => setStep('login')} />
+                <Welcome onStart={handleStartQuiz} />
             )}
             
-            {/* 2. Σελίδα Login */}
-            {step === 'login' && (
-                <Login onLogin={handleLogin} />
+            {/* 2. Σελίδα Quiz */}
+            {step === 'quiz' && user && (
+                <Quiz 
+                    key={user.username} // Χρήση του username για μοναδικότητα
+                    user={user} 
+                    onComplete={handleQuizComplete} 
+                />
             )}
 
-            {/* 3. Σελίδα Quiz - ΕΔΩ ΕΓΙΝΕ Η ΑΛΛΑΓΗ */}
-            {step === 'quiz' && user && (
-    <Quiz 
-        key={Date.now()} // Αυτό αναγκάζει το Quiz να ξαναξεκινήσει από το μηδέν
-        user={user} 
-        onComplete={handleQuizComplete} 
-    />
-)}
-
-            {/* 4. Σελίδα Αποτελεσμάτων (Placeholder) */}
+            {/* 3. Σελίδα Αποτελεσμάτων */}
             {step === 'results' && user && (
-    <Results username={user.username} strengths={results} />
-)}
+                <Results username={user.username} strengths={results} />
+            )}
         </div>
     );
 }

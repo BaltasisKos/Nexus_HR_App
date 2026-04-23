@@ -106,7 +106,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
-  background: #ffffff;
+  background: #f0eeee;
   border-top: 1px solid #f0f0f0;
   height: 90px;
   min-height: 90px;
@@ -222,6 +222,104 @@
   color: #1a1a1a;
   margin-top: auto; /* Διασφαλίζει ότι μένει πάνω από το footer */
   padding-top: 15px;
+}
+
+/* Το κουμπί που ανοίγει το QR */
+.qr-trigger-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 20;
+  background: rgba(0, 123, 255, 0.1);
+  border: 1px solid rgba(0, 123, 255, 0.2);
+  color: #007bff;
+  padding: 8px 15px;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.qr-trigger-btn:hover {
+  background: #007bff;
+  color: white;
+}
+
+/* Modal Overlay (Το σκοτεινό φόντο πίσω από το QR) */
+.qr-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Το λευκό παράθυρο του QR */
+.qr-modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  width: 300px;
+  position: relative;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #888;
+}
+
+.qr-code-container {
+  margin: 20px 0;
+  padding: 10px;
+  background: white;
+  border: 1px solid #eee;
+  display: inline-block;
+  border-radius: 12px;
+}
+
+.qr-modal-content h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.qr-modal-content p {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+.qr-trigger-btn {
+  /* ... τα υπόλοιπα styles σου ... */
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Κρύβουμε το κουμπί QR στα κινητά (αφού είναι ήδη στο κινητό) */
+@media (max-width: 768px) {
+  .qr-trigger-btn {
+    display: none;
+  }
 }
 
 /* Responsive για κινητά - Μειώνουμε κι άλλο τα μεγέθη */
