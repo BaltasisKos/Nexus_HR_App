@@ -1,62 +1,167 @@
-/* src/assets/css/Welcome.css */
+/* 1. Βασικό Container που κεντράρει την κάρτα στην οθόνη */
 .welcome-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f8fafc;
-    padding: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+/* 2. Η Κάρτα του Onboarding */
 .welcome-card {
-    background: #ffffff;
-    padding: 3rem 2rem;
-    border-radius: 24px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-    max-width: 440px;
-    width: 100%;
-    text-align: center;
+  background: white;
+  width: 100%;
+  max-width: 800px;
+  height: 600px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column; /* Swiper πάνω, Footer κάτω */
+  overflow: hidden;
+  position: relative;
 }
 
-.welcome-icon {
-    font-size: 4rem;
-    margin-bottom: 1.5rem;
-    display: block;
+/* 3. Ο χώρος του Swiper */
+.welcome-swiper {
+  flex: 1; /* Παίρνει όλο τον διαθέσιμο χώρο πάνω από το footer */
+  width: 100%;
 }
 
-.welcome-title {
-    font-size: 2rem;
-    color: #0f172a;
-    margin-bottom: 1rem;
-    font-weight: 800;
+/* 4. Το περιεχόμενο κάθε Slide */
+.slide-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0px;
+  text-align: center;
 }
 
-.welcome-text {
-    font-size: 1.1rem;
-    color: #475569;
-    line-height: 1.6;
-    margin-bottom: 2.5rem;
+.lottie-wrapper {
+  width: 280px;
+  height: 280px;
+  margin-bottom: -20px;
 }
 
-.start-button {
-    background-color: #2563eb;
-    color: white;
-    border: none;
-    padding: 1.1rem 2rem;
-    font-size: 1.2rem;
-    font-weight: 700;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    width: 100%;
+.slide-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
 }
 
-.start-button:hover {
-    background-color: #1d4ed8;
-    transform: translateY(-2px);
+.slide-content h2 {
+  font-size: 2rem;
+  color: #1a1a1a;
+  margin-bottom: 15px;
 }
 
-.start-button:active {
-    transform: translateY(0);
+.slide-content p {
+  font-size: 1.1rem;
+  color: #666;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+/* 5. Το Footer με τα κουμπιά και τις τελείες */
+.swiper-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  background: #ffffff;
+  border-top: 1px solid #f0f0f0;
+  height: 90px; /* Σταθερό ύψος */
+  min-height: 90px;
+  z-index: 10;
+  position: relative;
+}
+
+/* Περιοχές για κεντράρισμα των στοιχείων του footer */
+.footer-left, .footer-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.footer-right {
+  justify-content: flex-end;
+}
+
+/* 6. Custom Pagination (Τελείες) */
+.custom-pagination {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background: #cbd5e0 !important;
+  opacity: 1 !important;
+  transition: all 0.3s ease;
+  border-radius: 10px;
+}
+
+.swiper-pagination-bullet-active {
+  background: #007bff !important;
+  width: 28px; /* Εφέ "pill" για την ενεργή σελίδα */
+}
+
+/* 7. Τα Κουμπιά */
+.nav-btn {
+  background: transparent;
+  border: none;
+  color: #007bff;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 12px 20px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.nav-btn:hover {
+  opacity: 0.7;
+}
+
+/* Το κουμπί Start (τελευταίο slide) */
+.start-btn {
+  background: #007bff !important;
+  color: white !important;
+  padding: 12px 28px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+  opacity: 1;
+}
+
+/* 8. Media Queries για κινητά */
+@media (max-width: 600px) {
+  .welcome-card {
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  .slide-content h2 {
+    font-size: 1.6rem;
+    padding: 30px;;
+  }
+
+  .lottie-wrapper {
+    width: 220px;
+    height: 220px;
+  }
+
+  .swiper-footer {
+    padding: 0px 20px;
+  }
 }

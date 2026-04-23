@@ -36,3 +36,10 @@ Nexus HR moves beyond traditional skill-tracking. It focuses on **Behavioral DNA
    ```bash
    git clone [https://github.com/yourusername/nexus-hr.git](https://github.com/yourusername/nexus-hr.git)
    cd nexus-hr
+<<<<<<< HEAD
+=======
+
+
+   python main.py
+   npm start
+>>>>>>> 1d1045f (update welcome page with animation)
