@@ -1,4 +1,9 @@
-/* 1. Βασικό Container που κεντράρει την κάρτα στην οθόνη */
+/* ==========================================
+   1. BASICS & CONTAINERS
+   ========================================== */
+
+@import url('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css');
+
 .welcome-container {
   display: flex;
   justify-content: center;
@@ -9,7 +14,6 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* 2. Η Κάρτα του Onboarding */
 .welcome-card {
   background: white;
   width: 100%;
@@ -18,53 +22,85 @@
   border-radius: 24px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   display: flex;
-  flex-direction: column; /* Swiper πάνω, Footer κάτω */
+  flex-direction: column;
   overflow: hidden;
   position: relative;
 }
 
-/* 3. Ο χώρος του Swiper */
+/* ==========================================
+   2. SWIPER & SLIDES
+   ========================================== */
+
 .welcome-swiper {
-  flex: 1; /* Παίρνει όλο τον διαθέσιμο χώρο πάνω από το footer */
+  flex: 1;
   width: 100%;
 }
 
-/* 4. Το περιεχόμενο κάθε Slide */
+.welcome-swiper .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
 .slide-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
-  padding: 0px;
+  padding: 25px;
   text-align: center;
+  box-sizing: border-box;
 }
+
+/* ==========================================
+   3. ELEMENTS (LOTTIE & TEXT)
+   ========================================== */
 
 .lottie-wrapper {
-  width: 280px;
-  height: 280px;
-  margin-bottom: -20px;
+  width: 240px; /* Ελαφρώς μικρότερο για να χωράει το κείμενο από κάτω */
+  height: 240px;
+  margin-bottom: 10px;
 }
 
-.slide-icon {
-  font-size: 80px;
-  margin-bottom: 20px;
-}
-
-.slide-content h2 {
-  font-size: 2rem;
+.welcome-title {
+  font-size: 1.8rem;
   color: #1a1a1a;
+  margin-bottom: 10px;
+}
+
+.welcome-subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  max-width: 450px;
+  line-height: 1.5;
+  margin: 0 auto;
+}
+
+/* Ειδικό Layout για το Slide Περιγραφής (Slide 2) */
+.description-slide {
+  justify-content: space-between; /* Σπρώχνει το κείμενο "Πάμε" στη βάση */
+  padding: 60px 40px;
+}
+
+.description-text h3 {
+  font-size: 1.6rem;
+  color: #007bff;
   margin-bottom: 15px;
 }
 
-.slide-content p {
-  font-size: 1.1rem;
-  color: #666;
-  max-width: 400px;
-  line-height: 1.5;
+.bottom-call-to-action {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #222;
+  margin-bottom: 20px;
 }
 
-/* 5. Το Footer με τα κουμπιά και τις τελείες */
+/* ==========================================
+   4. FOOTER & NAVIGATION
+   ========================================== */
+
 .swiper-footer {
   display: flex;
   align-items: center;
@@ -72,13 +108,12 @@
   padding: 0 40px;
   background: #ffffff;
   border-top: 1px solid #f0f0f0;
-  height: 90px; /* Σταθερό ύψος */
+  height: 90px;
   min-height: 90px;
   z-index: 10;
   position: relative;
 }
 
-/* Περιοχές για κεντράρισμα των στοιχείων του footer */
 .footer-left, .footer-right {
   flex: 1;
   display: flex;
@@ -89,7 +124,6 @@
   justify-content: flex-end;
 }
 
-/* 6. Custom Pagination (Τελείες) */
 .custom-pagination {
   display: flex !important;
   justify-content: center;
@@ -109,10 +143,13 @@
 
 .swiper-pagination-bullet-active {
   background: #007bff !important;
-  width: 28px; /* Εφέ "pill" για την ενεργή σελίδα */
+  width: 28px;
 }
 
-/* 7. Τα Κουμπιά */
+/* ==========================================
+   5. BUTTONS
+   ========================================== */
+
 .nav-btn {
   background: transparent;
   border: none;
@@ -129,7 +166,6 @@
   opacity: 0.7;
 }
 
-/* Το κουμπί Start (τελευταίο slide) */
 .start-btn {
   background: #007bff !important;
   color: white !important;
@@ -141,27 +177,98 @@
 .start-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
-  opacity: 1;
 }
 
-/* 8. Media Queries για κινητά */
+/* Slide 2: Περιγραφή */
+.description-slide {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Σπρώχνει το "Πάμε να ξεκινήσουμε" τέρμα κάτω */
+  height: 100%;
+  padding: 30px 40px;
+  box-sizing: border-box;
+}
+
+.description-text h3 {
+  color: #007bff;
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+}
+
+/* Μικρότερο animation για να αφήσει χώρο στο κείμενο */
+.lottie-wrapper-small {
+  width: 240px;
+  height: 160px;
+  margin: 0 auto 15px auto;
+}
+
+.description-p {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+.description-highlight {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  font-style: italic;
+}
+
+.bottom-call-to-action {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-top: auto; /* Διασφαλίζει ότι μένει πάνω από το footer */
+  padding-top: 15px;
+}
+
+/* Responsive για κινητά - Μειώνουμε κι άλλο τα μεγέθη */
+@media (max-width: 600px) {
+  .lottie-wrapper-small {
+    width: 100px;
+    height: 100px;
+  }
+  .description-p {
+    font-size: 0.9rem;
+  }
+  .description-slide {
+    padding: 20px;
+  }
+}
+
+/* ==========================================
+   6. RESPONSIVE (MOBILE)
+   ========================================== */
+
 @media (max-width: 600px) {
   .welcome-card {
     height: 100vh;
     border-radius: 0;
   }
 
-  .slide-content h2 {
-    font-size: 1.6rem;
-    padding: 30px;;
+  .welcome-title {
+    font-size: 1.5rem;
+    padding: 0 10px;
+  }
+
+  .welcome-subtitle {
+    font-size: 1rem;
   }
 
   .lottie-wrapper {
-    width: 220px;
-    height: 220px;
+    width: 200px;
+    height: 200px;
   }
 
   .swiper-footer {
-    padding: 0px 20px;
+    padding: 0 20px;
+    height: 80px;
+    min-height: 80px;
+  }
+
+  .description-slide {
+    padding: 40px 20px;
   }
 }
