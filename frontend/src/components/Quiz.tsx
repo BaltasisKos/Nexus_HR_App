@@ -1,8 +1,8 @@
 // src/components/Quiz.tsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Question, UserData } from '../types';
 import '../assets/css/Quiz.css';
+import { getQuestions } from '../services/api.questions';
 
 interface QuizProps {
     user: UserData;
@@ -19,8 +19,8 @@ const Quiz: React.FC<QuizProps> = ({ user, onComplete }) => {
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
-                const response = await axios.get(`http://${window.location.hostname}:5000/api/questions`);
-                setQuestions(response.data);
+                const data = await getQuestions();
+                setQuestions(data);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching questions:", error);

@@ -27,7 +27,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
 
   const [formData, setFormData] = useState<UserData>({
     username: '',
-    age: 25,
+    age: 18,
     gender: 'Other'
   });
 
@@ -129,7 +129,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
                                     <label>Ηλικία</label>
                                     <input 
                                         type="number" 
-                                        min="10" max="99"
+                                        min="16" max="65"
                                         value={formData.age}
                                         onChange={(e) => setFormData({...formData, age: parseInt(e.target.value) || 0})}
                                     />
