@@ -69,3 +69,9 @@
     color: #2563eb;
     margin-right: 10px;
 }
+
+.option-button.selected {
+    background-color: #e2e8f0; /* Ή το χρώμα της επιλογής σου */
+    border-color: #3b82f6;
+    transform: scale(1.02);
+}
