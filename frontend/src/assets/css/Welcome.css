@@ -383,6 +383,13 @@
   }
 }
 
+/* Εξαφάνιση του Top Bar (Dashboard & QR) σε κινητά */
+@media (max-width: 768px) {
+    .welcome-top-bar {
+        display: none !important;
+    }
+}
+
 /* Responsive για κινητά - Μειώνουμε κι άλλο τα μεγέθη */
 @media (max-width: 600px) {
   .lottie-wrapper-small {

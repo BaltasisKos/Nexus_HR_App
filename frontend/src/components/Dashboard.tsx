@@ -2,34 +2,123 @@ import React from 'react';
 import { useTeamAnalytics } from '../hooks/useTeamAnalytics';
 import '../assets/css/Dashboard.css';
 
-const Dashboard: React.FC<{ data: any[]; onClose: () => void }> = ({ data, onClose }) => {
-    // Χρήση του hook
+interface DashboardProps {
+    data: any[];
+    onClose: () => void;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ data, onClose }) => {
     const { groups, totalUsers, topDomain } = useTeamAnalytics(data);
 
+    // Λογική για εξαγωγή σε CSV
+    const downloadCSV = () => {
+        let csvContent = "data:text/csv;charset=utf-8,Domain,Member Name\n";
+        Object.entries(groups).forEach(([domain, members]) => {
+            members.forEach(member => {
+                csvContent += `${domain},${member}\n`;
+            });
+        });
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "nexus_team_report.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     return (
-        <div className="dashboard-overlay">
-            <div className="dashboard-content">
-                <header className="dashboard-header">
-                    <h2>Ομαδικά Αποτελέσματα ({totalUsers} Χρήστες)</h2>
-                    <button onClick={onClose} className="close-btn">&times;</button>
+        <div className="dashboard-fullscreen">
+            <aside className="sidebar">
+                <div className="sidebar-brand">
+                    <div className="brand-icon">NX</div>
+                    <span>NEXUS HR </span>
+                </div>
+                
+                <nav className="sidebar-menu">
+                    <div className="menu-label">Analytics</div>
+                    <button className="menu-item active">
+                        <span className="icon">📊</span> Επισκόπηση Ομάδας
+                    </button>
+                    <button className="menu-item" onClick={downloadCSV}>
+                        <span className="icon">📥</span> Εξαγωγή σε CSV
+                    </button>
+                </nav>
+
+                <div className="sidebar-status">
+                    <div className="status-indicator">
+                        <span className="pulse"></span>
+                        Live Database
+                    </div>
+                    <p>{totalUsers} καταγεγραμμένοι χρήστες</p>
+                </div>
+            </aside>
+
+            <main className="main-viewport">
+                <header className="top-nav">
+                    <div className="search-placeholder">
+                        Admin Management Console
+                    </div>
+                    <button className="exit-btn" onClick={onClose}>
+                        Έξοδος από το Dashboard 
+                    </button>
                 </header>
 
-                <div className="top-insight">
-                    Η ομάδα σας κυριαρχείται από το Domain: <strong>{topDomain}</strong>
-                </div>
+                <div className="content-container">
+                    <section className="welcome-banner">
+                        <h1>Team Capabilities Report</h1>
+                        <p>Ανάλυση στρατηγικής κατανομής ταλέντων βάσει των 4 Domains.</p>
+                    </section>
 
-                <div className="groups-grid">
-                    {Object.entries(groups).map(([domain, members]) => (
-                        <div key={domain} className="group-column">
-                            <h3>{domain}</h3>
-                            <div className="count">{members.length} μέλη</div>
-                            <ul>
-                                {members.map((m, i) => <li key={i}>{m}</li>)}
-                            </ul>
+                    <div className="metrics-grid">
+                        <div className="metric-card primary">
+                            <label>Dominant Domain</label>
+                            <h3>{topDomain || "Calculating..."}</h3>
                         </div>
-                    ))}
+                        <div className="metric-card">
+                            <label>Total Participants</label>
+                            <h3>{totalUsers}</h3>
+                        </div>
+                        <div className="metric-card">
+                            <label>Database Status</label>
+                            <h3>Synchronized</h3>
+                        </div>
+                    </div>
+
+                    <div className="data-grid">
+                        {Object.entries(groups).map(([domain, members]) => (
+                            <div key={domain} className="data-panel">
+                                <div className="panel-header">
+                                    <h3>{domain}</h3>
+                                    <span className="count-pill">{members.length}</span>
+                                </div>
+                                <div className="table-wrapper">
+                                    <table className="admin-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Ονοματεπώνυμο</th>
+                                                <th>Ρόλος / Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {members.length > 0 ? (
+                                                members.map((name, i) => (
+                                                    <tr key={i}>
+                                                        <td>{name}</td>
+                                                        <td><span className="status-tag">Candidate</span></td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr><td colSpan={2} className="empty">No entries found</td></tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            </main>
         </div>
     );
 };
