@@ -1,27 +1,28 @@
-# Nexus HR - Strengths Assessment Tool 🚀
+# Nexus HR 
+### ⚠️ Personal Project - Not for Commercial Use
 
-Το **Nexus HR** είναι μια σύγχρονη web εφαρμογή αξιολόγησης προσωπικού, βασισμένη στη φιλοσοφία των 34 ταλέντων (Strengths-Based Development) για προσωπική χρήση και οχι εμπορική. Επιτρέπει στους χρήστες να ανακαλύψουν τα κυρίαρχα ταλέντα τους μέσα από ένα διαδραστικό ερωτηματολόγιο και παρέχει λεπτομερή ανάλυση των αποτελεσμάτων τους.
+**Nexus HR**  isn't just a strengths-tracking tool; it's a team-building architect. While most platforms focus on what an employee does, Nexus HR focuses on how an employee thrives. By mapping the unique DNA of each team member, it provides a blueprint for creating balanced, resilient, and synchronized workforces.
 
 <div align="center" style="display: flex; justify-content: center; align-items: flex-start; gap: 10px;">
   <img src="./frontend/src/assets/images/DesktopView.png" height="350" alt="Desktop View" />
   <img src="./frontend/src/assets/images/MobileView.png" height="350" alt="Mobile View" />
 </div>
 
-## ✨ Χαρακτηριστικά
-* **Προσωποποιημένη Εμπειρία:** Εισαγωγή στοιχείων χρήστη και δυναμική φόρτωση ερωτήσεων.
-* **Έξυπνος Αλγόριθμος:** Υπολογισμός σκορ σε πραγματικό χρόνο για 34 διαφορετικές θεματικές ενότητες ταλέντων.
-* **Visual Results:** Παρουσίαση των Top 5 ταλέντων με χρήση Color Coding ανάλογα με το Domain (Executing, Influencing, Relationship Building, Strategic Thinking).
-* **Τοπική Αποθήκευση:** Αυτόματη καταγραφή των αποτελεσμάτων σε JSON αρχείο για μελλοντική ανάλυση από το τμήμα HR.
-* **Responsive UI:** Σύγχρονο design φτιαγμένο με React και Material UI.
+## ✨ Features
+* **Personalized Experience:** User data input and dynamic loading of questions.
+* **Smart Algorithm:** Real-time score calculation for 34 different talent themes.
+* **Visual Results:** Presentation of the Top 5 talents using Color Coding based on their Domain (Executing, Influencing, Relationship Building, Strategic Thinking).
+* **Local Storage:** Automatic recording of results in a JSON file for future analysis.
+* **Responsive UI:** Modern design built with React and Material UI.
 
-## 🛠️ Τεχνολογίες
+## 🛠️ Technologies
 * **Frontend:** React, TypeScript, Material UI, CSS3.
 * **Backend:** Python, Flask, Flask-CORS.
 * **Data Handling:** JSON, Python Dictionaries.
 
 ---
 
-## 🚀 Οδηγίες Εγκατάστασης
+## 🚀 Installation Instructions
 
 1.  **Backend:**
     ```bash
