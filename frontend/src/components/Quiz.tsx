@@ -4,10 +4,13 @@ import { Pagination } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
 import { Question, UserData } from '../types';
 import { getQuestions } from '../services/api.questions';
+import Typography from '@mui/material/Typography';
+import CircularProgressWithLabel from '@mui/material/CircularProgress'
+
 
 // CSS Imports
 import '../assets/css/Quiz.css';
-import '../assets/css/Welcome.css'; // Επαναχρησιμοποίηση των nav-btn styles
+import '../assets/css/Welcome.css';
 
 interface QuizProps {
   user: UserData;
@@ -20,6 +23,7 @@ const Quiz: React.FC<QuizProps> = ({ user, onComplete }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, [number, number]>>({});
   const [loading, setLoading] = useState(true);
+  const [isSliding, setIsSliding] = useState(false); // Lock για γρήγορα clicks
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -36,35 +40,82 @@ const Quiz: React.FC<QuizProps> = ({ user, onComplete }) => {
   }, []);
 
   const handleSelectOption = (questionId: number, choice: 'A' | 'B') => {
+    // Αν το slide αλλάζει ήδη, αγνοούμε το επιπλέον κλικ
+    if (isSliding) return;
+
     const score: [number, number] = choice === 'A' ? [1, 0] : [0, 1];
+    
+    // Ενημέρωση των απαντήσεων
     setAnswers(prev => ({ ...prev, [questionId]: score }));
 
-    // Αυτόματο Next slide μετά την επιλογή (προαιρετικό αλλά βελτιώνει το UX)
+    // Κλείδωμα και αυτόματη αλλαγή slide
+    setIsSliding(true);
+    
     setTimeout(() => {
-      if (currentIndex < questions.length - 1) {
-        swiperRef.current?.slideNext();
+      if (swiperRef.current && currentIndex < questions.length - 1) {
+        swiperRef.current.slideNext();
       }
-    }, 300);
+      setIsSliding(false);
+    }, 400); // 400ms είναι αρκετά για να ολοκληρωθεί το animation του Swiper
   };
 
   const handleFinalSubmit = () => {
-    if (Object.keys(answers).length < questions.length) {
-      alert("Παρακαλώ απαντήστε σε όλες τις ερωτήσεις πριν την υποβολή.");
+    const totalAnswers = Object.keys(answers).length;
+    const totalQuestions = questions.length;
+
+    console.log(`Υποβολή: ${totalAnswers} από ${totalQuestions}`);
+
+    if (totalAnswers < totalQuestions) {
+      alert(`Παρακαλώ απαντήστε σε όλες τις ερωτήσεις. (Απαντημένες: ${totalAnswers}/${totalQuestions})`);
       return;
     }
     onComplete(answers);
   };
 
-  if (loading) return <div className="quiz-container">Φόρτωση ερωτήσεων...</div>;
+  if (loading) {
+  return (
+    <div style={{ 
+      position: 'fixed',   // Σπάει τα όρια του welcome-container
+      top: 0, 
+      left: 0, 
+      width: '100vw', 
+      height: '100vh', 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      backgroundColor: '#ffffff', // Ή ό,τι χρώμα έχει το background σου
+      zIndex: 9999 
+    }}>
+        {/* Κρατάμε το welcome-card για να έχει το ίδιο size και στυλ με πριν */}
+        <div className="welcome-card" style={{ 
+          textAlign: 'center', 
+          padding: '40px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '20px',
+          // Εξασφαλίζουμε ότι δεν θα κληρονομήσει περίεργα margins
+          margin: 0 
+        }}>
+           <Typography variant="h6" sx={{ fontWeight: 500 }}>
+             Φόρτωση ερωτήσεων...
+           </Typography>
+
+           <CircularProgressWithLabel value={0} /> 
+        </div>
+    </div>
+  );
+}
 
   const progress = ((currentIndex + 1) / questions.length) * 100;
   const isLastQuestion = currentIndex === questions.length - 1;
 
   return (
-    <div className="welcome-container"> {/* Χρήση ίδιου container για ομοιομορφία */}
+    <div className="welcome-container">
       <div className="welcome-card quiz-card-full">
         
-        {/* Header με Progress */}
+        {/* Header με Progress Bar */}
         <div className="quiz-header" style={{ padding: '20px' }}>
           <div className="progress-bar">
             <div className="progress-fill" style={{ width: `${progress}%` }}></div>
@@ -74,13 +125,14 @@ const Quiz: React.FC<QuizProps> = ({ user, onComplete }) => {
           </p>
         </div>
 
-        {/* Swiper για τις Ερωτήσεις */}
+        {/* Swiper Container */}
         <div style={{ flex: 1, overflow: 'hidden', width: '100%' }}>
           <Swiper
             modules={[Pagination]}
             spaceBetween={0}
             slidesPerView={1}
-            allowTouchMove={false} // Κλειδώνουμε το swipe για να αναγκάσουμε χρήση κουμπιών/επιλογών
+            speed={400}
+            allowTouchMove={false} // Μόνο μέσω buttons για αποφυγή λαθών
             onBeforeInit={(swiper) => {
               swiperRef.current = swiper;
             }}
@@ -115,7 +167,7 @@ const Quiz: React.FC<QuizProps> = ({ user, onComplete }) => {
           </Swiper>
         </div>
 
-        {/* Footer (Ίδιο Styling με το Welcome) */}
+        {/* Footer Navigation */}
         <div className="swiper-footer">
           <div className="footer-left">
             {currentIndex > 0 && (
@@ -128,21 +180,14 @@ const Quiz: React.FC<QuizProps> = ({ user, onComplete }) => {
           <div className="custom-pagination"></div>
 
           <div className="footer-right">
-            {isLastQuestion ? (
+            {isLastQuestion && (
               <button 
                 className="nav-btn start-btn" 
                 onClick={handleFinalSubmit}
+                // Το κουμπί Finish ενεργοποιείται μόνο αν έχει απαντηθεί και η τελευταία ερώτηση
                 disabled={Object.keys(answers).length < questions.length}
               >
                 Finish
-              </button>
-            ) : (
-              <button 
-                className="nav-btn" 
-                onClick={() => swiperRef.current?.slideNext()}
-                disabled={!answers[questions[currentIndex].id]} // Κλείδωμα αν δεν απαντήθηκε
-              >
-                Next
               </button>
             )}
           </div>

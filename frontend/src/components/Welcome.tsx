@@ -52,7 +52,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
 
 
         {/* Προσθήκη style={{ height: '100%' }} για να μην "τρώει" το footer */}
-        <div style={{ flex: 1, overflow: 'hidden', width: '100%' }}>
+        <div style={{ flex: 1, overflow: 'hidden', width: '100%', }}>
           <Swiper
             modules={[Pagination]}
             spaceBetween={0} // Μηδένισε το κενό για να μην "φεύγουν" τα slides

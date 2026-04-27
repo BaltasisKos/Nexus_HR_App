@@ -67,13 +67,15 @@ def submit_quiz():
         score = sorted_talents[i][1]
         
         # Παίρνουμε τις πληροφορίες από το themes_data
-        info = STRENGTHS_THEMES.get(talent_name, {"Domain": "Unknown", "Description": ""})
+        info = STRENGTHS_THEMES.get(talent_name)
         
         top_5.append({
-            "Title": talent_name,
+            "ThemeID": talent_name,
+            "Title": info["Title"],
             "Domain": info["Domain"],
             "Description": info["Description"],
-            "Score": score
+            "Score": score,
+            
         })
 
     return jsonify({
