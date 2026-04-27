@@ -1,5 +1,9 @@
 import random
 
+import json
+import os
+from datetime import datetime
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -31,10 +35,35 @@ def get_questions():
     
     return jsonify(clean_questions)
 
+# Συνάρτηση για αποθήκευση σε JSON
+def save_user_results(result_data):
+    file_path = 'results_database.json'
+    
+    # 1. Αρχικοποίηση λίστας αποτελεσμάτων
+    all_results = []
+    
+    # 2. Αν το αρχείο υπάρχει ήδη, διάβασε τα περιεχόμενά του
+    if os.path.exists(file_path):
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                all_results = json.load(f)
+        except json.JSONDecodeError:
+            # Αν το αρχείο είναι κατεστραμμένο ή άδειο
+            all_results = []
+
+    # 3. Πρόσθεσε το νέο αποτέλεσμα στη λίστα
+    all_results.append(result_data)
+    
+    # 4. Αποθήκευση πίσω στο αρχείο
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json.dump(all_results, f, ensure_ascii=False, indent=4)
+
 @app.route('/api/submit', methods=['POST'])
 def submit_quiz():
     data = request.json
     username = data.get('username')
+    age = data.get('age')
+    gender = data.get('gender')
     user_answers = data.get('answers') # Format: {"1": [1,0], "2": [0,1]}
 
     # 1. Δημιουργούμε ένα "κουμπαρά" σκορ για κάθε ταλέντο που υπάρχει στο themes_data
@@ -62,27 +91,46 @@ def submit_quiz():
 
     # 4. Κατασκευή του Top 5 με όλα τα extra στοιχεία (Domain, Description)
     top_5 = []
-    for i in range(min(5, len(sorted_talents))):
-        talent_name = sorted_talents[i][0]
-        score = sorted_talents[i][1]
-        
-        # Παίρνουμε τις πληροφορίες από το themes_data
-        info = STRENGTHS_THEMES.get(talent_name)
-        
-        top_5.append({
-            "ThemeID": talent_name,
-            "Title": info["Title"],
-            "Domain": info["Domain"],
-            "Description": info["Description"],
-            "Score": score,
+    seen_titles = set()
+    for talent_name, score in sorted_talents:
+        # Αν έχουμε ήδη βρει 5 μοναδικά, σταματάμε
+        if len(top_5) == 5:
+            break
             
-        })
+        # Αν το ταλέντο υπάρχει στα δεδομένα μας ΚΑΙ δεν το έχουμε ήδη βάλει
+        info = STRENGTHS_THEMES.get(talent_name)
+        if info and talent_name not in seen_titles:
+            top_5.append({
+                "ThemeID": talent_name,
+                "Title": info["Title"],
+                "Domain": info["Domain"],
+                "Description": info["Description"],
+                "Score": score
+            })
+            # Σημειώνουμε το ID για να μην το ξαναβάλουμε
+            seen_titles.add(talent_name)
+        
+        # ΠΡΟΕΤΟΙΜΑΣΙΑ ΔΕΔΟΜΕΝΩΝ ΓΙΑ ΑΠΟΘΗΚΕΥΣΗ
+    full_result_to_save = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "user_info": {
+            "username": username,
+            "age": age,
+            "gender": gender
+        },
+        "top_5_results": top_5,
+        
+    }
+
+    # ΚΛΗΣΗ ΤΗΣ ΣΥΝΑΡΤΗΣΗΣ ΑΠΟΘΗΚΕΥΣΗΣ
+    save_user_results(full_result_to_save)
 
     return jsonify({
         "status": "success",
         "username": username,
         "top_5": top_5
     })
+    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
