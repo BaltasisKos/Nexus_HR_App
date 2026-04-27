@@ -2,6 +2,11 @@
 
 Το **Nexus HR** είναι μια σύγχρονη web εφαρμογή αξιολόγησης προσωπικού, βασισμένη στη φιλοσοφία των 34 ταλέντων (Strengths-Based Development) για προσωπική χρήση και οχι εμπορική. Επιτρέπει στους χρήστες να ανακαλύψουν τα κυρίαρχα ταλέντα τους μέσα από ένα διαδραστικό ερωτηματολόγιο και παρέχει λεπτομερή ανάλυση των αποτελεσμάτων τους.
 
+<p align="center">
+  <img src="./frontend/src/assets/images/DesktopView.png" width="50" alt="Desktop View" />
+  <img src="./frontend/src/assets/images/MobileView.png" width="50" alt="Μοβιλε View" />
+</p>
+
 ## ✨ Χαρακτηριστικά
 * **Προσωποποιημένη Εμπειρία:** Εισαγωγή στοιχείων χρήστη και δυναμική φόρτωση ερωτήσεων.
 * **Έξυπνος Αλγόριθμος:** Υπολογισμός σκορ σε πραγματικό χρόνο για 34 διαφορετικές θεματικές ενότητες ταλέντων.
@@ -13,16 +18,6 @@
 * **Frontend:** React, TypeScript, Material UI, CSS3.
 * **Backend:** Python, Flask, Flask-CORS.
 * **Data Handling:** JSON, Python Dictionaries.
-
----
-
-## 📸 Screenshots
-
-
-<p align="center">
-  <img src="./frontend/src/assets/images/DesktopView.png" width="50" alt="Desktop View" />
-  <img src="./frontend/src/assets/images/MobileView.png" width="50" alt="Μοβιλε View" />
-</p>
 
 ---
 
