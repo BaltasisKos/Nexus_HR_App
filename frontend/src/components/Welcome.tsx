@@ -9,6 +9,11 @@ import { QRCodeSVG } from 'qrcode.react'; // Import το QR
 import '../assets/css/Login.css';
 import { UserData } from '../types';
 
+import Dashboard from '../components/Dashboard'; // Import το Dashboard σου
+
+
+
+
 
 
 // ΑΥΤΑ ΤΑ IMPORTS ΕΙΝΑΙ ΚΡΙΣΙΜΑ - ΑΝ ΛΕΙΠΟΥΝ, ΤΑ SLIDES ΦΑΙΝΟΝΤΑΙ ΟΛΑ ΜΑΖΙ
@@ -24,6 +29,22 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
   const [isLastSlide, setIsLastSlide] = useState(false);
   const [isFirstSlide, setIsFirstSlide] = useState(true);
   const [showQR, setShowQR] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false); // New state
+  const [allResults, setAllResults] = useState<any[]>([]); // State για τα δεδομένα
+
+  // Λήψη δεδομένων από το Backend
+    const fetchResults = () => {
+        fetch('http://localhost:5000/api/results')
+            .then(res => res.json())
+            .then(data => {
+                setAllResults(data);
+                setShowDashboard(true); // Ανοίγει το dashboard αφού έρθουν τα δεδομένα
+            })
+            .catch(err => {
+                console.error("Error fetching results:", err);
+                alert("Αδυναμία σύνδεσης με το διακομιστή δεδομένων.");
+            });
+    };
 
   const [formData, setFormData] = useState<UserData>({
     username: '',
@@ -45,9 +66,15 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
 
         {/* ΚΟΥΜΠΙ QR (Πάνω δεξιά στην κάρτα) */}
         {isFirstSlide && (
-            <button className="qr-trigger-btn" onClick={() => setShowQR(true)}>
-                📱 Σύνδεση με κινητό
-            </button>
+            <div className="welcome-top-bar">
+                <button className="dashboard-trigger-btn" onClick={(fetchResults) }>
+                    📊 Team Dashboard
+                </button>
+                
+                <button className="qr-trigger-btn" onClick={() => setShowQR(true)}>
+                    📱 Σύνδεση με κινητό
+                </button>
+            </div>
 )}
 
 
@@ -191,6 +218,15 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
           </div>
         </div>
       </div>
+      {/* DASHBOARD MODAL: ΕΚΤΟΣ ΤΟΥ CARD ΓΙΑ ΝΑ ΜΗΝ ΠΕΡΙΟΡΙΖΕΤΑΙ ΑΠΟ ΤΟ OVERFLOW */}
+      {showDashboard && (
+        <Dashboard 
+          data={allResults} 
+          onClose={() => setShowDashboard(false)} 
+        />
+      )}
+
+
     </div>
   );
 };

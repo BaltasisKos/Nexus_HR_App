@@ -57,6 +57,15 @@ def save_user_results(result_data):
     # 4. Αποθήκευση πίσω στο αρχείο
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(all_results, f, ensure_ascii=False, indent=4)
+        
+@app.route('/api/results', methods=['GET'])
+def get_results():
+    try:
+        with open('results_database.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return jsonify(data)
+    except FileNotFoundError:
+        return jsonify([]) # Επιστρέφει άδειο πίνακα αν δεν υπάρχει το αρχείο        
 
 @app.route('/api/submit', methods=['POST'])
 def submit_quiz():

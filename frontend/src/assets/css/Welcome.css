@@ -27,6 +27,67 @@
   position: relative;
 }
 
+/* Το container των κουμπιών στο πάνω μέρος */
+.welcome-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px; /* Ίδιο padding για ομοιομορφία */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box; /* ΚΡΙΣΙΜΟ: Για να μην βγαίνουν τα κουμπιά εκτός κάρτας */
+    z-index: 10;
+}
+
+/* Στυλ για το Dashboard Button - Αντιγραφή από το QR Button */
+.dashboard-trigger-btn {
+    background: white; /* Ή το χρώμα που έχει το QR button */
+    border: none;
+    padding: 10px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Σκιά για να ξεχωρίζει πάνω από το περιεχόμενο */
+    transition: all 0.3s ease;
+}
+
+/* Hover εφέ ίδιο με το QR button */
+.dashboard-trigger-btn:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+}
+
+/* Σιγουρέψου ότι και το QR button έχει το ίδιο στυλ αν δεν το παίρνει αυτόματα */
+.qr-trigger-btn {
+    background: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin: 0 !important;
+    transition: all 0.3s ease;
+}
+
+.qr-trigger-btn:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+}
+
 /* ==========================================
    2. SWIPER & SLIDES
    ========================================== */
