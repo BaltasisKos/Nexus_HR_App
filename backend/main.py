@@ -140,6 +140,33 @@ def submit_quiz():
         "top_5": top_5
     })
     
+@app.route('/api/delete_user', methods=['POST'])
+def delete_user():
+    data_received = request.json
+    user_to_delete = data_received.get('username')
+    
+    if not user_to_delete:
+        return jsonify({"error": "No username provided"}), 400
+
+    try:
+        with open('results_database.json', 'r', encoding='utf-8') as f:
+            database = json.load(f)
+        
+        # ΠΡΟΣΟΧΗ ΕΔΩ: Πηγαίνουμε βαθύτερα στη δομή [user_info][username]
+        new_database = [
+            user for user in database 
+            if user.get('user_info', {}).get('username') != user_to_delete
+        ]
+        
+        with open('results_database.json', 'w', encoding='utf-8') as f:
+            json.dump(new_database, f, indent=4, ensure_ascii=False)
+            
+        return jsonify({"message": "Deleted successfully"}), 200
+    except Exception as e:
+        # Αυτό θα σου πει ακριβώς τι φταίει αν ξανασυμβεί σφάλμα
+        print(f"Error during delete: {e}")
+        return jsonify({"error": str(e)}), 500
+    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

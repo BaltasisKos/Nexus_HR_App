@@ -27,12 +27,32 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onClose }) => {
         document.body.removeChild(link);
     };
 
+    const deleteUser = async (username: string) => {
+    if (!window.confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις τον χρήστη ${username};`)) return;
+
+    try {
+        const response = await fetch('http://localhost:5000/api/delete_user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+        });
+
+        if (response.ok) {
+            alert("Ο χρήστης διαγράφηκε!");
+            // Εδώ καλούμε ξανά τη fetchResults του Welcome για να ανανεωθεί η λίστα
+            onClose(); // Κλείνουμε το dashboard για να αναγκάσουμε το refresh
+        }
+    } catch (err) {
+        console.error("Delete failed:", err);
+    }
+};
+
     return (
         <div className="dashboard-fullscreen">
             <aside className="sidebar">
                 <div className="sidebar-brand">
                     <div className="brand-icon">NX</div>
-                    <span>NEXUS HR </span>
+                    <span>Nexus Hr </span>
                 </div>
                 
                 <nav className="sidebar-menu">
@@ -105,6 +125,15 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onClose }) => {
                                                 members.map((name, i) => (
                                                     <tr key={i}>
                                                         <td>{name}</td>
+                                                        <td className="actions-cell">
+                                                            <button 
+                                                                className="delete-row-btn" 
+                                                                onClick={() => deleteUser(name)}
+                                                                title="Διαγραφή Χρήστη"
+                                                            >
+                                                                🗑️
+                                                            </button>
+                                                        </td>
                                                         <td><span className="status-tag">Candidate</span></td>
                                                     </tr>
                                                 ))
