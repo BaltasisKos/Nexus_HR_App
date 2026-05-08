@@ -44,7 +44,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
 
   // Λήψη δεδομένων από το Backend
     const fetchResults = () => {
-        fetch('{API_BASE_URL}/api/results')
+        fetch('http://localhost:5000/api/results')
             .then(res => res.json())
             .then(data => {
                 setAllResults(data);
