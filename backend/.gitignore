@@ -1,6 +1,8 @@
 # Data files
 results_database.json
 strengths_assessment.db
+questions_data.py
+themes_data.py
 
 # Python internals
 __pycache__/

@@ -20,18 +20,3 @@
 * **Backend:** Python, Flask, Flask-CORS.
 * **Data Handling:** JSON, Python Dictionaries.
 
----
-
-## 🚀 Installation Instructions
-
-1.  **Backend:**
-    ```bash
-    cd backend
-    python main.py
-    ```
-2.  **Frontend:**
-    ```bash
-    cd frontend
-    npm install
-    npm start
-    ```
