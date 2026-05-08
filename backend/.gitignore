@@ -1,0 +1,11 @@
+# Data files
+results_database.json
+strengths_assessment.db
+
+# Python internals
+__pycache__/
+*.py[cod]
+
+# Environments (αν έχεις)
+.venv/
+.env
