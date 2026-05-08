@@ -1,5 +1,5 @@
 import random
-
+import socket
 import json
 import os
 from datetime import datetime
@@ -12,8 +12,26 @@ from questions_data import QUESTIONS
 from themes_data import STRENGTHS_THEMES # Αν το έχεις ονομάσει αλλιώς, άλλαξέ το εδώ
 
 app = Flask(__name__)
+
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # Δεν χρειάζεται να υπάρχει σύνδεση, απλώς βρίσκει την IP της διεπαφής
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+    except Exception:
+        ip = '127.0.0.1'
+    finally:
+        s.close()
+    return ip
+
+@app.route('/api/get-ip', methods=['GET'])
+def server_ip():
+    return jsonify({"ip": get_local_ip()})
+
+
 CORS(app, resources={r"/api/*": {
-    "origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
+    "origins": "*",
     "methods": ["GET", "POST", "OPTIONS"],
     "allow_headers": ["Content-Type"]
 }})

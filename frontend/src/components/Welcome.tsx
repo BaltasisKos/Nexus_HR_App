@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import animationData from "../assets/images/start.json";
 import recruitmentAnimation from "../assets/images/Recruitment.json";
@@ -31,10 +31,20 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
   const [showQR, setShowQR] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false); // New state
   const [allResults, setAllResults] = useState<any[]>([]); // State για τα δεδομένα
+  const [serverIP, setServerIP] = useState('');
+
+
+  useEffect(() => {
+    // Ρωτάμε το Python backend ποια είναι η IP του
+    fetch('http://localhost:5000/api/get-ip')
+        .then(res => res.json())
+        .then(data => setServerIP(data.ip))
+        .catch(err => console.error("Could not fetch IP", err));
+}, []);
 
   // Λήψη δεδομένων από το Backend
     const fetchResults = () => {
-        fetch('http://localhost:5000/api/results')
+        fetch('{API_BASE_URL}/api/results')
             .then(res => res.json())
             .then(data => {
                 setAllResults(data);
@@ -188,7 +198,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
               <button className="close-modal" onClick={() => setShowQR(false)}>×</button>
               <h3>Σκανάρετε για κινητό</h3>
               <div className="qr-code-container">
-                <QRCodeSVG value={`http://`} size={200} />
+                <QRCodeSVG value={`http://${serverIP}:3000`} size={200} />
               </div>
               <p>Ανοίξτε την κάμερα του κινητού σας για να συνεχίσετε την εμπειρία φορητά.</p>
             </div>
