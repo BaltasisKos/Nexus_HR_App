@@ -91,12 +91,23 @@ def submit_quiz():
     username = data.get('username')
     age = data.get('age')
     gender = data.get('gender')
+    specialty = data.get('specialty') # Λήψη της ειδικότητας
     user_answers = data.get('answers') # Format: {"1": [1,0], "2": [0,1]}
+    
+    # 1. Ορισμός των επιτρεπόμενων ειδικοτήτων
+    ALLOWED_SPECIALTIES = ["Μπάρμαν", "Σερβιτόρος", "Μάγειρας"]
 
-    # 1. Δημιουργούμε ένα "κουμπαρά" σκορ για κάθε ταλέντο που υπάρχει στο themes_data
+    # 2. Έλεγχος αν η ειδικότητα είναι έγκυρη
+    if specialty not in ALLOWED_SPECIALTIES:
+        return jsonify({
+            "status": "error",
+            "message": f"Μη έγκυρη ειδικότητα. Επιτρεπόμενες επιλογές: {', '.join(ALLOWED_SPECIALTIES)}"
+        }), 400 # Επιστρέφει HTTP Status 400 (Bad Request)
+
+    # 3. Δημιουργούμε ένα "κουμπαρά" σκορ για κάθε ταλέντο που υπάρχει στο themes_data
     tallies = {name: 0 for name in STRENGTHS_THEMES.keys()}
 
-    # 2. Υπολογισμός: Διατρέχουμε τις ερωτήσεις από το questions_data
+    # 4. Υπολογισμός: Διατρέχουμε τις ερωτήσεις από το questions_data
     for q in QUESTIONS:
         q_id = str(q["id"])
         if q_id in user_answers:
@@ -113,10 +124,10 @@ def submit_quiz():
                 if talent_name in tallies:
                     tallies[talent_name] += 1
 
-    # 3. Ταξινόμηση ταλέντων βάσει σκορ (από το μεγαλύτερο στο μικρότερο)
+    # 5. Ταξινόμηση ταλέντων βάσει σκορ (από το μεγαλύτερο στο μικρότερο)
     sorted_talents = sorted(tallies.items(), key=lambda x: x[1], reverse=True)
 
-    # 4. Κατασκευή του Top 5 με όλα τα extra στοιχεία (Domain, Description)
+    # 6. Κατασκευή του Top 5 με όλα τα extra στοιχεία (Domain, Description)
     top_5 = []
     seen_titles = set()
     for talent_name, score in sorted_talents:
@@ -143,7 +154,8 @@ def submit_quiz():
         "user_info": {
             "username": username,
             "age": age,
-            "gender": gender
+            "gender": gender,
+            "specialty": specialty # Αποθήκευση της έγκυρης ειδικότητας
         },
         "top_5_results": top_5,
         

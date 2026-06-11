@@ -1,16 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTeamAnalytics } from '../hooks/useTeamAnalytics';
 import '../assets/css/Dashboard.css';
 
-interface DashboardProps {
-    data: any[];
-    onClose: () => void;
+interface Strength {
+    Title: string;
+    Domain: string;
+    Description?: string;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ data, onClose }) => {
-    const { groups, totalUsers, topDomain } = useTeamAnalytics(data);
+interface UserData {
+    username: string;
+    name?: string; // Προσθήκη για αποφυγή TypeScript error στο φιλτράρισμα
+    strengths: Strength[];
+}
 
-    // Λογική για εξαγωγή σε CSV
+interface DashboardProps {
+    data: UserData[]; // Εδώ έρχονται τα δεδομένα από το Python backend
+    onClose: () => void;
+    onUserDeleted?: (username: string) => void; // Callback για να ενημερώνεται το state στον parent
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ data, onClose, onUserDeleted }) => {
+    const { groups, totalUsers, topDomain,} = useTeamAnalytics(data);
+    const [activeTab, setActiveTab] = useState<'overview' | 'user-results'>('overview');
+
+    // Helper συνάρτηση για να δίνουμε class χρώματος ανάλογα με το Domain
+    const getDomainClass = (domain: string) => {
+        switch (domain?.toLowerCase()) {
+            case 'executing': return 'domain-executing';
+            case 'influencing': return 'domain-influencing';
+            case 'relationship building': return 'domain-relationship';
+            case 'strategic thinking': return 'domain-strategic';
+            default: return 'domain-default';
+        }
+    };
+
     const downloadCSV = () => {
         let csvContent = "data:text/csv;charset=utf-8,Domain,Member Name\n";
         Object.entries(groups).forEach(([domain, members]) => {
@@ -28,37 +52,50 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onClose }) => {
     };
 
     const deleteUser = async (username: string) => {
-    if (!window.confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις τον χρήστη ${username};`)) return;
-
-    try {
-        const response = await fetch('http://localhost:5000/api/delete_user', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username })
-        });
-
-        if (response.ok) {
-            alert("Ο χρήστης διαγράφηκε!");
-            // Εδώ καλούμε ξανά τη fetchResults του Welcome για να ανανεωθεί η λίστα
-            onClose(); // Κλείνουμε το dashboard για να αναγκάσουμε το refresh
+        if (!window.confirm(`Είσαι σίγουρος ότι θέλεις να διαγράψεις τον χρήστη ${username};`)) return;
+        try {
+            const response = await fetch('http://localhost:5000/api/delete_user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            });
+            if (response.ok) {
+                alert("Ο χρήστης διαγράφηκε!");
+                if (onUserDeleted) {
+                    onUserDeleted(username); // Ενημέρωση του parent state
+                } else {
+                    onClose(); // Fallback αν δεν έχει οριστεί η callback
+                }
+            } else {
+                alert("Η διαγραφή απέτυχε. Παρακαλώ προσπαθήστε ξανά.");
+            }
+        } catch (err) {
+            console.error("Delete failed:", err);
+            alert("Σφάλμα κατά τη σύνδεση με τον διακομιστή.");
         }
-    } catch (err) {
-        console.error("Delete failed:", err);
-    }
-};
+    };
 
     return (
         <div className="dashboard-fullscreen">
             <aside className="sidebar">
                 <div className="sidebar-brand">
                     <div className="brand-icon">NX</div>
-                    <span>Nexus Hr </span>
+                    <span>Nexus Hr</span>
                 </div>
                 
                 <nav className="sidebar-menu">
                     <div className="menu-label">Analytics</div>
-                    <button className="menu-item active">
+                    <button 
+                        className={`menu-item ${activeTab === 'overview' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('overview')}
+                    >
                         <span className="icon">📊</span> Επισκόπηση Ομάδας
+                    </button>
+                    <button 
+                        className={`menu-item ${activeTab === 'user-results' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('user-results')}
+                    >
+                        <span className="icon">📥</span> Αποτελέσματα ανα χρήστη
                     </button>
                     <button className="menu-item" onClick={downloadCSV}>
                         <span className="icon">📥</span> Εξαγωγή σε CSV
@@ -76,12 +113,8 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onClose }) => {
 
             <main className="main-viewport">
                 <header className="top-nav">
-                    <div className="search-placeholder">
-                        Admin Management Console
-                    </div>
-                    <button className="exit-btn" onClick={onClose}>
-                        Έξοδος από το Dashboard 
-                    </button>
+                    <div className="search-placeholder">Admin Management Console</div>
+                    <button className="exit-btn" onClick={onClose}>Έξοδος από το Dashboard</button>
                 </header>
 
                 <div className="content-container">
@@ -90,62 +123,126 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onClose }) => {
                         <p>Ανάλυση στρατηγικής κατανομής ταλέντων βάσει των 4 Domains.</p>
                     </section>
 
-                    <div className="metrics-grid">
-                        <div className="metric-card primary">
-                            <label>Dominant Domain</label>
-                            <h3>{topDomain || "Calculating..."}</h3>
-                        </div>
-                        <div className="metric-card">
-                            <label>Total Participants</label>
-                            <h3>{totalUsers}</h3>
-                        </div>
-                        <div className="metric-card">
-                            <label>Database Status</label>
-                            <h3>Synchronized</h3>
-                        </div>
-                    </div>
-
-                    <div className="data-grid">
-                        {Object.entries(groups).map(([domain, members]) => (
-                            <div key={domain} className="data-panel">
-                                <div className="panel-header">
-                                    <h3>{domain}</h3>
-                                    <span className="count-pill">{members.length}</span>
+                    {/* --- VIEW 1: ΕΠΙΣΚΟΠΗΣΗ ΟΜΑΔΑΣ --- */}
+                    {activeTab === 'overview' && (
+                        <>
+                            <div className="metrics-grid">
+                                <div className="metric-card primary">
+                                    <label>Dominant Domain</label>
+                                    <h3>{topDomain || "Calculating..."}</h3>
                                 </div>
-                                <div className="table-wrapper">
-                                    <table className="admin-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Ονοματεπώνυμο</th>
-                                                <th>Ρόλος / Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {members.length > 0 ? (
-                                                members.map((name, i) => (
-                                                    <tr key={i}>
-                                                        <td>{name}</td>
-                                                        <td className="actions-cell">
-                                                            <button 
-                                                                className="delete-row-btn" 
-                                                                onClick={() => deleteUser(name)}
-                                                                title="Διαγραφή Χρήστη"
-                                                            >
-                                                                🗑️
-                                                            </button>
-                                                        </td>
-                                                        <td><span className="status-tag">Candidate</span></td>
-                                                    </tr>
-                                                ))
-                                            ) : (
-                                                <tr><td colSpan={2} className="empty">No entries found</td></tr>
-                                            )}
-                                        </tbody>
-                                    </table>
+                                <div className="metric-card">
+                                    <label>Total Participants</label>
+                                    <h3>{totalUsers}</h3>
+                                </div>
+                                <div className="metric-card">
+                                    <label>Database Status</label>
+                                    <h3>Synchronized</h3>
                                 </div>
                             </div>
-                        ))}
-                    </div>
+
+                            <div className="data-grid">
+                                {Object.entries(groups).map(([domain, members]) => (
+                                    <div key={domain} className="data-panel">
+                                        <div className="panel-header">
+                                            <h3>{domain}</h3>
+                                            <span className="count-pill">{members.length}</span>
+                                        </div>
+                                        <div className="table-wrapper">
+                                            <table className="admin-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Ονοματεπώνυμο</th>
+                                                        <th>Ρόλος / Status</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {members.length > 0 ? (
+                                                        members.map((name, i) => (
+                                                            <tr key={i}>
+                                                                <td>{name}</td>
+                                                                <td><span className="status-tag">Candidate</span></td>
+                                                                <td className="actions-cell">
+                                                                    <button className="delete-row-btn" onClick={() => deleteUser(name)}>🗑️</button>
+                                                                </td>
+                                                            </tr>
+                                                        ))
+                                                    ) : (
+                                                        <tr><td colSpan={3} className="empty">No entries found</td></tr>
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
+
+                    {/* --- VIEW 2: ΑΠΟΤΕΛΕΣΜΑΤΑ ΑΝΑ ΧΡΗΣΤΗ --- */}
+                    {activeTab === 'user-results' && (
+                        <div className="user-strengths-panel">
+                            <div className="panel-header">
+                                <h3>Λίστα Χρηστών & Top 5 Strengths</h3>
+                            </div>
+                            <div className="table-wrapper">
+                                <table className="admin-table user-strengths-table">
+                                    <thead>
+                                        <tr>
+                                            <th style={{ width: '25%' }}>Ονοματεπώνυμο</th>
+                                            <th style={{ width: '65%' }}>Κυρίαρχα Δυνατά Σημεία (Top 5)</th>
+                                            <th style={{ width: '10%', textAlign: 'center' }}>Ενέργειες</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {Array.from(new Set(Object.values(groups).flat())).map((username, idx) => {
+                                            const userFullData = data.find(u => u.username === username || u.name === username);
+                                            
+                                            return (
+                                                <tr key={idx}>
+                                                    <td className="user-name-cell">
+                                                        <strong>{username}</strong>
+                                                    </td>
+                                                    <td>
+                                                        <div className="strengths-inline-list">
+                                                            {userFullData && userFullData.strengths && userFullData.strengths.length > 0 ? (
+                                                                userFullData.strengths.slice(0, 5).map((s: Strength, sIdx: number) => (
+                                                                    <span 
+                                                                        key={sIdx} 
+                                                                        className={`strength-inline-badge ${getDomainClass(s.Domain)}`}
+                                                                        title={`Domain: ${s.Domain}`}
+                                                                    >
+                                                                        <span className="badge-index">{sIdx + 1}</span>
+                                                                        {s.Title}
+                                                                    </span>
+                                                                ))
+                                                            ) : (
+                                                                <span className="no-data-text">Δεν βρέθηκαν strengths για τον χρήστη</span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    <td style={{ textAlign: 'center' }}>
+                                                        <button 
+                                                            className="delete-row-btn" 
+                                                            onClick={() => deleteUser(username)}
+                                                            title="Διαγραφή Χρήστη"
+                                                        >
+                                                            🗑️
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                        
+                                        {Object.values(groups).flat().length === 0 && (
+                                            <tr><td colSpan={3} className="empty">Δεν βρέθηκαν χρήστες στο σύστημα.</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </main>
         </div>

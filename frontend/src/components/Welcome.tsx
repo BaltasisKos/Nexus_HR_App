@@ -34,27 +34,33 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
   const [serverIP, setServerIP] = useState('');
 
 
+  // Δυναμικός εντοπισμός της IP του Backend. 
+  // Αν είμαστε στο PC, το window.location.hostname είναι 'localhost'.
+  // Αν είμαστε στο κινητό, θα είναι η IP του PC (π.χ. '192.168.1.5').
+  const currentHostname = window.location.hostname;
+  const backendUrl = `http://${currentHostname}:5000`;
+
   useEffect(() => {
-    // Ρωτάμε το Python backend ποια είναι η IP του
-    fetch('http://localhost:5000/api/get-ip')
+    // Ρωτάμε το Python backend ποια είναι η IP του χρησιμοποιώντας το σωστό hostname
+    fetch(`${backendUrl}/api/get-ip`)
         .then(res => res.json())
         .then(data => setServerIP(data.ip))
         .catch(err => console.error("Could not fetch IP", err));
-}, []);
+  }, [backendUrl]);
 
   // Λήψη δεδομένων από το Backend
-    const fetchResults = () => {
-        fetch('http://localhost:5000/api/results')
+  const fetchResults = () => {
+        fetch(`${backendUrl}/api/results`)
             .then(res => res.json())
             .then(data => {
                 setAllResults(data);
-                setShowDashboard(true); // Ανοίγει το dashboard αφού έρθουν τα δεδομένα
+                setShowDashboard(true); 
             })
             .catch(err => {
                 console.error("Error fetching results:", err);
                 alert("Αδυναμία σύνδεσης με το διακομιστή δεδομένων.");
             });
-    };
+  };
 
   const [formData, setFormData] = useState<UserData>({
     username: '',
@@ -69,6 +75,10 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
         alert("Παρακαλώ συμπληρώστε τα στοιχεία σας.");
     }
   };
+
+  // Δυναμική δημιουργία του URL για το QR Code (παίρνει αυτόματα και το Port του React)
+  const reactPort = window.location.port ? `:${window.location.port}` : '';
+  const mobileLink = `http://${serverIP}${reactPort}`;
 
   return (
     <div className="welcome-container">
