@@ -65,7 +65,8 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
   const [formData, setFormData] = useState<UserData>({
     username: '',
     age: 18,
-    gender: 'Other'
+    gender: 'Other',
+    specialty: 'Ειδικότητα'
   });
 
   const handleFinalStart = () => {
@@ -191,6 +192,19 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
                                         <option value="Male">Άνδρας</option>
                                         <option value="Female">Γυναίκα</option>
                                         <option value="Other">Άλλο</option>
+                                    </select>
+                                </div>
+
+                                <div className="input-group">
+                                    <label>Ειδικότητα</label>
+                                    <select 
+                                        value={formData.specialty}
+                                        onChange={(e) => setFormData({...formData, specialty: e.target.value})}
+                                    >
+                                        <option value="Μπάρμαν">Μπάρμαν</option>
+                                        <option value="Σερβιτόρος">Σερβιτόρος</option>
+                                        <option value="Μάγειρας">Μάγειρας</option>
+                                        <option value="Μπαρίστα">Μπαρίστα</option>
                                     </select>
                                 </div>
                             </div>

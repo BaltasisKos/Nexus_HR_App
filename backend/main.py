@@ -95,7 +95,7 @@ def submit_quiz():
     user_answers = data.get('answers') # Format: {"1": [1,0], "2": [0,1]}
     
     # 1. Ορισμός των επιτρεπόμενων ειδικοτήτων
-    ALLOWED_SPECIALTIES = ["Μπάρμαν", "Σερβιτόρος", "Μάγειρας"]
+    ALLOWED_SPECIALTIES = ["Μπάρμαν", "Σερβιτόρος", "Μάγειρας", "Μπαρίστα"]
 
     # 2. Έλεγχος αν η ειδικότητα είναι έγκυρη
     if specialty not in ALLOWED_SPECIALTIES:
