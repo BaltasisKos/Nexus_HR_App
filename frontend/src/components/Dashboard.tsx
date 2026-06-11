@@ -17,7 +17,6 @@ interface UserData {
         gender: string;
         specialty?: string;
     };
-    // Διατηρούμε τα παλιά για συμβατότητα αν χρειαστεί
     username?: string;
     name?: string;
     strengths?: Strength[];
@@ -33,7 +32,6 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onClose, onUserDeleted }) =
     const { groups, totalUsers, topDomain } = useTeamAnalytics(data);
     const [activeTab, setActiveTab] = useState<'overview' | 'user-results'>('overview');
 
-    // Helper συνάρτηση για να δίνουμε class χρώματος ανάλογα με το Domain
     const getDomainClass = (domain: string) => {
         switch (domain?.toLowerCase()) {
             case 'executing': return 'domain-executing';
@@ -218,15 +216,19 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onClose, onUserDeleted }) =
                                     <tbody>
                                         {Array.from(new Set(Object.values(groups).flat())).map((username, idx) => {
                                             
-                                            // 🔍 Αναζήτηση με βάση το nested username
                                             const userFullData = data.find(u => 
                                                 u.username === username || 
                                                 u.name === username ||
                                                 u.user_info?.username === username
                                             );
                                             
-                                            // 🎯 Στόχευση στο σωστό backend key
                                             const userStrengths = userFullData?.top_5_results || [];
+
+                                            // 1. Υπολογισμός του Total Score ΜΙΑ φορά για τον τρέχοντα χρήστη
+                                            const totalScore = userStrengths.reduce((sum: number, current: any) => {
+                                                const val = current.Score || current.score || current.Value || current.value || current.percentage || 0;
+                                                return sum + Number(val);
+                                            }, 0);
 
                                             return (
                                                 <tr key={idx}>
@@ -243,17 +245,22 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onClose, onUserDeleted }) =
                                                                 userStrengths.map((s: any, sIdx: number) => {
                                                                     const title = s.Title || s.title || "Unknown";
                                                                     const domain = s.Domain || s.domain || "default";
+                                                                    
+                                                                    // 2. Εξαγωγή του raw score και υπολογισμός του σωστού %
+                                                                    const rawScore = Number(s.Score || s.score || s.Value || s.value || s.percentage || 0);
+                                                                    const percentage = totalScore > 0 ? Math.round((rawScore / totalScore) * 100) : 0;
 
                                                                     return (
                                                                         <React.Fragment key={sIdx}>
                                                                             <span 
                                                                                 className={`strength-inline-badge ${getDomainClass(domain)}`}
-                                                                                title={`Domain: ${domain}`}
+                                                                                title={`Domain: ${domain} | Raw Score: ${rawScore}`}
                                                                             >
-                                                                                {/* 1. Ο αριθμός αφαιρέθηκε από εδώ */}
                                                                                 {title}
+                                                                                <span style={{ fontSize: '0.75rem', opacity: 0.85, fontWeight: 'normal', marginLeft: '3px' }}>
+                                                                                    ({percentage}%)
+                                                                                </span>
                                                                             </span>
-                                                                            {/* 2. Προσθήκη κόμματος αν υπάρχουν επόμενα στοιχεία */}
                                                                             {sIdx < userStrengths.length - 1 && <span className="comma-separator">, </span>}
                                                                         </React.Fragment>
                                                                     );
