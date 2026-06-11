@@ -232,8 +232,9 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onClose, onUserDeleted }) =
                                                 <tr key={idx}>
                                                     <td className="user-name-cell">
                                                         <strong>{username}</strong>
-                                                        <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                                                            {userFullData?.user_info?.specialty}
+                                                        <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '4px', lineHeight: '1.4' }}>
+                                                            <div>💼 {userFullData?.user_info?.specialty || "Candidate"}</div>
+                                                            <div>🎂 {userFullData?.user_info?.age} ετών • {userFullData?.user_info?.gender === 'Male' ? 'Άνδρας' : userFullData?.user_info?.gender === 'Female' ? 'Γυναίκα' : userFullData?.user_info?.gender}</div>
                                                         </div>
                                                     </td>
                                                     <td>
