@@ -9,19 +9,28 @@ interface Strength {
 }
 
 interface UserData {
-    username: string;
-    name?: string; // Προσθήκη για αποφυγή TypeScript error στο φιλτράρισμα
-    strengths: Strength[];
+    timestamp?: string;
+    top_5_results?: Strength[]; // Το σωστό key από το Python backend
+    user_info?: {
+        username: string;
+        age: number;
+        gender: string;
+        specialty?: string;
+    };
+    // Διατηρούμε τα παλιά για συμβατότητα αν χρειαστεί
+    username?: string;
+    name?: string;
+    strengths?: Strength[];
 }
 
 interface DashboardProps {
-    data: UserData[]; // Εδώ έρχονται τα δεδομένα από το Python backend
+    data: UserData[]; 
     onClose: () => void;
-    onUserDeleted?: (username: string) => void; // Callback για να ενημερώνεται το state στον parent
+    onUserDeleted?: (username: string) => void; 
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ data, onClose, onUserDeleted }) => {
-    const { groups, totalUsers, topDomain,} = useTeamAnalytics(data);
+    const { groups, totalUsers, topDomain } = useTeamAnalytics(data);
     const [activeTab, setActiveTab] = useState<'overview' | 'user-results'>('overview');
 
     // Helper συνάρτηση για να δίνουμε class χρώματος ανάλογα με το Domain
@@ -62,9 +71,9 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onClose, onUserDeleted }) =
             if (response.ok) {
                 alert("Ο χρήστης διαγράφηκε!");
                 if (onUserDeleted) {
-                    onUserDeleted(username); // Ενημέρωση του parent state
+                    onUserDeleted(username); 
                 } else {
-                    onClose(); // Fallback αν δεν έχει οριστεί η callback
+                    onClose(); 
                 }
             } else {
                 alert("Η διαγραφή απέτυχε. Παρακαλώ προσπαθήστε ξανά.");
@@ -95,7 +104,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onClose, onUserDeleted }) =
                         className={`menu-item ${activeTab === 'user-results' ? 'active' : ''}`}
                         onClick={() => setActiveTab('user-results')}
                     >
-                        <span className="icon">📥</span> Αποτελέσματα ανα χρήστη
+                        <span className="icon">📥</span> Αποτελέσματα ανά χρήστη
                     </button>
                     <button className="menu-item" onClick={downloadCSV}>
                         <span className="icon">📥</span> Εξαγωγή σε CSV
@@ -153,21 +162,32 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onClose, onUserDeleted }) =
                                                 <thead>
                                                     <tr>
                                                         <th>Ονοματεπώνυμο</th>
-                                                        <th>Ρόλος / Status</th>
+                                                        <th>Ειδικότητα</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {members.length > 0 ? (
-                                                        members.map((name, i) => (
-                                                            <tr key={i}>
-                                                                <td>{name}</td>
-                                                                <td><span className="status-tag">Candidate</span></td>
-                                                                <td className="actions-cell">
-                                                                    <button className="delete-row-btn" onClick={() => deleteUser(name)}>🗑️</button>
-                                                                </td>
-                                                            </tr>
-                                                        ))
+                                                        members.map((name, i) => {
+                                                            const userFullData = data.find(u => 
+                                                                u.username === name || 
+                                                                u.name === name || 
+                                                                u.user_info?.username === name
+                                                            );
+                                                            const userSpecialty = userFullData?.user_info?.specialty || "Candidate";
+
+                                                            return (
+                                                                <tr key={i}>
+                                                                    <td>{name}</td>
+                                                                    <td>
+                                                                        <span className="status-tag">{userSpecialty}</span>
+                                                                    </td>
+                                                                    <td className="actions-cell">
+                                                                        <button className="delete-row-btn" onClick={() => deleteUser(name)}>🗑️</button>
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        })
                                                     ) : (
                                                         <tr><td colSpan={3} className="empty">No entries found</td></tr>
                                                     )}
@@ -197,26 +217,46 @@ const Dashboard: React.FC<DashboardProps> = ({ data, onClose, onUserDeleted }) =
                                     </thead>
                                     <tbody>
                                         {Array.from(new Set(Object.values(groups).flat())).map((username, idx) => {
-                                            const userFullData = data.find(u => u.username === username || u.name === username);
                                             
+                                            // 🔍 Αναζήτηση με βάση το nested username
+                                            const userFullData = data.find(u => 
+                                                u.username === username || 
+                                                u.name === username ||
+                                                u.user_info?.username === username
+                                            );
+                                            
+                                            // 🎯 Στόχευση στο σωστό backend key
+                                            const userStrengths = userFullData?.top_5_results || [];
+
                                             return (
                                                 <tr key={idx}>
                                                     <td className="user-name-cell">
                                                         <strong>{username}</strong>
+                                                        <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                                                            {userFullData?.user_info?.specialty}
+                                                        </div>
                                                     </td>
                                                     <td>
                                                         <div className="strengths-inline-list">
-                                                            {userFullData && userFullData.strengths && userFullData.strengths.length > 0 ? (
-                                                                userFullData.strengths.slice(0, 5).map((s: Strength, sIdx: number) => (
-                                                                    <span 
-                                                                        key={sIdx} 
-                                                                        className={`strength-inline-badge ${getDomainClass(s.Domain)}`}
-                                                                        title={`Domain: ${s.Domain}`}
-                                                                    >
-                                                                        <span className="badge-index">{sIdx + 1}</span>
-                                                                        {s.Title}
-                                                                    </span>
-                                                                ))
+                                                            {userStrengths.length > 0 ? (
+                                                                userStrengths.map((s: any, sIdx: number) => {
+                                                                    const title = s.Title || s.title || "Unknown";
+                                                                    const domain = s.Domain || s.domain || "default";
+
+                                                                    return (
+                                                                        <React.Fragment key={sIdx}>
+                                                                            <span 
+                                                                                className={`strength-inline-badge ${getDomainClass(domain)}`}
+                                                                                title={`Domain: ${domain}`}
+                                                                            >
+                                                                                {/* 1. Ο αριθμός αφαιρέθηκε από εδώ */}
+                                                                                {title}
+                                                                            </span>
+                                                                            {/* 2. Προσθήκη κόμματος αν υπάρχουν επόμενα στοιχεία */}
+                                                                            {sIdx < userStrengths.length - 1 && <span className="comma-separator">, </span>}
+                                                                        </React.Fragment>
+                                                                    );
+                                                                })
                                                             ) : (
                                                                 <span className="no-data-text">Δεν βρέθηκαν strengths για τον χρήστη</span>
                                                             )}

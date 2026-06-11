@@ -20,29 +20,54 @@ const App: React.FC = () => {
         setStep('quiz');
     };
 
-    const handleQuizComplete = async (finalAnswers: Record<number, [number, number]>) => {
-        try {
-            const payload = {
-                username: user?.username,
-                age: user?.age,
-                gender: user?.gender,
-                answers: finalAnswers
-            };
+   const handleQuizComplete = async (finalAnswers: Record<number, [number, number]>) => {
+    try {
+        // 1. Μετατρέπουμε τις απαντήσεις από [1,0] σε 'A' ή 'B' 
+        // σε περίπτωση που το Python backend περιμένει string χαρακτήρες.
+        const formattedAnswers = Object.entries(finalAnswers).reduce((acc, [qId, score]) => {
+            acc[Number(qId)] = score[0] === 1 ? 'A' : 'B';
+            return acc;
+        }, {} as Record<number, 'A' | 'B'>);
 
-            // Κλήση στο Python Backend (Flask/FastAPI)
-            const response = await axios.post('http://localhost:5000/api/submit', payload, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            setResults(response.data.top_5);
+        // 2. Χτίζουμε το payload ακριβώς όπως το Interface UserData + το answers
+        const payload = {
+            username: user?.username || '',
+            age: Number(user?.age || 0),
+            gender: user?.gender || '',
+            specialty: user?.specialty || 'Candidate', // <--- Αυτό έλειπε και έσκαγε το 400!
+            answers: formattedAnswers 
+        };
+
+        console.log("Sending payload to backend:", payload);
+
+        // Κλήση στο Python Backend
+        const response = await axios.post('http://localhost:5000/api/submit', payload, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        // Έλεγχος για το πού επιστρέφει τα αποτελέσματα ο server (top_5 ή strengths)
+        if (response.data && (response.data.top_5 || response.data.strengths)) {
+            setResults(response.data.top_5 || response.data.strengths);
             setStep('results');
-        } catch (error) {
-            console.error("Error submitting quiz:", error);
-            alert("Κάτι πήγε λάθος με την αποστολή των αποτελεσμάτων.");
+        } else {
+            console.error("Unexpected response structure:", response.data);
+            alert("Τα αποτελέσματα επιστράφηκαν με μη έγκυρη δομή.");
         }
-    };
+
+    } catch (error: any) {
+        console.error("Error submitting quiz:", error);
+        
+        // Αν ο server στείλει λεπτομέρειες για το λάθος, τις εμφανίζουμε στην κονσόλα
+        if (error.response && error.response.data) {
+            console.error("Backend Error Details:", error.response.data);
+            alert(`Σφάλμα: ${error.response.data.message || error.response.data.error || "400 Bad Request"}`);
+        } else {
+            alert("Κάτι πήγε λάθος με την αποστολή των απαντήσεων.");
+        }
+    }
+};
 
     return (
         <div className="App">
