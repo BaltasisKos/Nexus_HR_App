@@ -64,17 +64,31 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
 
   const [formData, setFormData] = useState<UserData>({
     username: '',
-    age: 18,
-    gender: 'Other',
-    specialty: 'Ειδικότητα'
+    age: 0,
+    gender: '',
+    specialty: ''
   });
 
   const handleFinalStart = () => {
-    if (formData.username.trim() && formData.age > 0) {
-        onStart(formData);
-    } else {
-        alert("Παρακαλώ συμπληρώστε τα στοιχεία σας.");
+    if (!formData.username.trim()) {
+        alert("Παρακαλώ συμπληρώστε το Ονοματεπώνυμό σας.");
+        return;
     }
+    if (!formData.age || formData.age < 16 || formData.age > 65) {
+        alert("Παρακαλώ εισάγετε μια έγκυρη ηλικία μεταξύ 16 και 65 ετών.");
+        return;
+    }
+    if (!formData.gender) {
+        alert("Παρακαλώ επιλέξτε το Φύλο σας.");
+        return;
+    }
+    if (!formData.specialty) {
+        alert("Παρακαλώ επιλέξτε την Ειδικότητά σας.");
+        return;
+    }
+
+    // 🚀 Αν όλα είναι σωστά, τότε μόνο προχωράει στο επόμενο slide / τεστ
+    
   };
 
   // Δυναμική δημιουργία του URL για το QR Code (παίρνει αυτόματα και το Port του React)
@@ -169,6 +183,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
                                     placeholder="π.χ. Γιάννης Παπαδόπουλος"
                                     value={formData.username}
                                     onChange={(e) => setFormData({...formData, username: e.target.value})}
+                                    required
                                 />
                             </div>
 
@@ -178,8 +193,9 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
                                     <input 
                                         type="number" 
                                         min="16" max="65"
-                                        value={formData.age}
+                                        value={formData.age || ""}
                                         onChange={(e) => setFormData({...formData, age: parseInt(e.target.value) || 0})}
+                                        required
                                     />
                                 </div>
 
@@ -188,7 +204,9 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
                                     <select 
                                         value={formData.gender}
                                         onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                                        required
                                     >
+                                        <option value=""hidden>Επιλέξτε Φύλλο</option>
                                         <option value="Male">Άνδρας</option>
                                         <option value="Female">Γυναίκα</option>
                                         <option value="Other">Άλλο</option>
@@ -200,7 +218,9 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
                                     <select 
                                         value={formData.specialty}
                                         onChange={(e) => setFormData({...formData, specialty: e.target.value})}
+                                        required
                                     >
+                                        <option value=""hidden>Επιλέξτε Ειδικότητα</option>
                                         <option value="Μπάρμαν">Μπάρμαν</option>
                                         <option value="Σερβιτόρος">Σερβιτόρος</option>
                                         <option value="Μάγειρας">Μάγειρας</option>

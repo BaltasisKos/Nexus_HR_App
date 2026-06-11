@@ -54,7 +54,7 @@ const Results: React.FC<ResultsProps> = ({ username, strengths }) => {
                     className="restart-btn" 
                     onClick={() => window.location.reload()}
                 >
-                    <span className="icon">↺</span> Επανάληψη Τεστ
+                    <span className="icon">↺</span> Έξοδος στην Αρχική
                 </button>
             </footer>
         </div>
