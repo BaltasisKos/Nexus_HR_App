@@ -2,7 +2,13 @@ import { useMemo } from 'react';
 
 export const useTeamAnalytics = (data: any[]) => {
     return useMemo(() => {
-        if (!data || data.length === 0) return { groups: {}, totalUsers: 0, topDomain: '' };
+        if (!data || data.length === 0) {
+            return { 
+                groups: { 'Executing': [], 'Influencing': [], 'Relationship Building': [], 'Strategic Thinking': [] }, 
+                totalUsers: 0, 
+                topDomain: '' 
+            };
+        }
 
         const groups: { [key: string]: string[] } = {
             'Executing': [],
@@ -11,37 +17,54 @@ export const useTeamAnalytics = (data: any[]) => {
             'Strategic Thinking': []
         };
 
-        const domainTotals: { [key: string]: number } = {};
+        const domainTotals: { [key: string]: number } = {
+            'Executing': 0,
+            'Influencing': 0,
+            'Relationship Building': 0,
+            'Strategic Thinking': 0
+        };
 
         data.forEach(user => {
-            const counts: { [key: string]: number } = {};
+            const scores: { [key: string]: number } = {
+                'Executing': 0,
+                'Influencing': 0,
+                'Relationship Building': 0,
+                'Strategic Thinking': 0
+            };
             
-            // Μέτρησε τα domains στο top_5 του κάθε χρήστη
+            // 1. Άθροισε τα πραγματικά Scores του κάθε χρήστη
             user.top_5_results.forEach((s: any) => {
-                counts[s.Domain] = (counts[s.Domain] || 0) + 1;
-                domainTotals[s.Domain] = (domainTotals[s.Domain] || 0) + 1;
+                const currentScore = Number(s.Score || s.score || 0);
+                scores[s.Domain] = (scores[s.Domain] || 0) + currentScore;
             });
 
-            // Βρες το κυρίαρχο domain του χρήστη
-            const dominant = Object.keys(counts).reduce((a, b) => 
-                counts[a] > counts[b] ? a : b
+            // 2. Βρες το κυρίαρχο domain του χρήστη με βάση τους πόντους
+            const dominant = Object.keys(scores).reduce((a, b) => 
+                scores[a] > scores[b] ? a : b
             );
 
-            if (groups[dominant]) {
-                groups[dominant].push(user.user_info.username);
+            // 3. Πρόσθεσε τον χρήστη στο σωστό group (χρησιμοποιώντας το σωστό path για το username)
+            const username = user.user_info?.username || user.username || user.name;
+            if (groups[dominant] && username) {
+                groups[dominant].push(username);
             }
+
+            // 4. Ενημέρωσε τα συνολικά σκορ της ομάδας για το topDomain card
+            Object.keys(scores).forEach(domain => {
+                domainTotals[domain] += scores[domain];
+            });
         });
 
-        // Βρες ποιο domain επικρατεί σε όλη την ομάδα
+        // 5. Βρες ποιο domain επικρατεί συνολικά στην ομάδα
         const teamDominant = Object.keys(domainTotals).reduce((a, b) => 
             domainTotals[a] > domainTotals[b] ? a : b
-        , '');
+        , 'Executing');
 
         return {
             groups,
             totalUsers: data.length,
             topDomain: teamDominant,
-            domainTotals // Χρήσιμο αν θέλεις να φτιάξεις γράφημα αργότερα
+            domainTotals
         };
     }, [data]);
 };

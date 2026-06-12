@@ -5,19 +5,11 @@ import recruitmentAnimation from "../assets/images/Recruitment.json";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
-import { QRCodeSVG } from 'qrcode.react'; // Import το QR
+import { QRCodeSVG } from 'qrcode.react'; 
 import '../assets/css/Login.css';
 import { UserData } from '../types';
 
-import Dashboard from '../components/Dashboard'; // Import το Dashboard σου
-
-
-
-
-
-
-// ΑΥΤΑ ΤΑ IMPORTS ΕΙΝΑΙ ΚΡΙΣΙΜΑ - ΑΝ ΛΕΙΠΟΥΝ, ΤΑ SLIDES ΦΑΙΝΟΝΤΑΙ ΟΛΑ ΜΑΖΙ
-
+import Dashboard from '../components/Dashboard'; 
 import "../assets/css/Welcome.css";
 
 interface WelcomeProps {
@@ -29,26 +21,20 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
   const [isLastSlide, setIsLastSlide] = useState(false);
   const [isFirstSlide, setIsFirstSlide] = useState(true);
   const [showQR, setShowQR] = useState(false);
-  const [showDashboard, setShowDashboard] = useState(false); // New state
-  const [allResults, setAllResults] = useState<any[]>([]); // State για τα δεδομένα
+  const [showDashboard, setShowDashboard] = useState(false); 
+  const [allResults, setAllResults] = useState<any[]>([]); 
   const [serverIP, setServerIP] = useState('');
 
-
-  // Δυναμικός εντοπισμός της IP του Backend. 
-  // Αν είμαστε στο PC, το window.location.hostname είναι 'localhost'.
-  // Αν είμαστε στο κινητό, θα είναι η IP του PC (π.χ. '192.168.1.5').
   const currentHostname = window.location.hostname;
   const backendUrl = `http://${currentHostname}:5000`;
 
   useEffect(() => {
-    // Ρωτάμε το Python backend ποια είναι η IP του χρησιμοποιώντας το σωστό hostname
     fetch(`${backendUrl}/api/get-ip`)
         .then(res => res.json())
         .then(data => setServerIP(data.ip))
         .catch(err => console.error("Could not fetch IP", err));
   }, [backendUrl]);
 
-  // Λήψη δεδομένων από το Backend
   const fetchResults = () => {
         fetch(`${backendUrl}/api/results`)
             .then(res => res.json())
@@ -87,11 +73,10 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
         return;
     }
 
-    // 🚀 Αν όλα είναι σωστά, τότε μόνο προχωράει στο επόμενο slide / τεστ
-    
+    // 🚀 ΔΙΟΡΘΩΣΗ: Καλούμε την onStart περνώντας τα δεδομένα της φόρμας
+    onStart(formData);
   };
 
-  // Δυναμική δημιουργία του URL για το QR Code (παίρνει αυτόματα και το Port του React)
   const reactPort = window.location.port ? `:${window.location.port}` : '';
   const mobileLink = `http://${serverIP}${reactPort}`;
 
@@ -102,7 +87,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
         {/* ΚΟΥΜΠΙ QR (Πάνω δεξιά στην κάρτα) */}
         {isFirstSlide && (
             <div className="welcome-top-bar">
-                <button className="dashboard-trigger-btn" onClick={(fetchResults) }>
+                <button className="dashboard-trigger-btn" onClick={fetchResults}>
                     📊 Team Dashboard
                 </button>
                 
@@ -110,16 +95,14 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
                     📱 Σύνδεση με κινητό
                 </button>
             </div>
-)}
+        )}
 
-
-        {/* Προσθήκη style={{ height: '100%' }} για να μην "τρώει" το footer */}
         <div style={{ flex: 1, overflow: 'hidden', width: '100%', }}>
           <Swiper
             modules={[Pagination]}
-            spaceBetween={0} // Μηδένισε το κενό για να μην "φεύγουν" τα slides
+            spaceBetween={0} 
             slidesPerView={1}
-            allowTouchMove={true} // Επιτρέπει το σύρσιμο με το ποντίκι/δάχτυλο
+            allowTouchMove={true} 
             pagination={{ clickable: true, el: '.custom-pagination' }}
             onBeforeInit={(swiper) => {
               swiperRef.current = swiper;
@@ -206,7 +189,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
                                         onChange={(e) => setFormData({...formData, gender: e.target.value})}
                                         required
                                     >
-                                        <option value=""hidden>Επιλέξτε Φύλλο</option>
+                                        <option value="" hidden>Επιλέξτε Φύλο</option>
                                         <option value="Male">Άνδρας</option>
                                         <option value="Female">Γυναίκα</option>
                                         <option value="Other">Άλλο</option>
@@ -220,7 +203,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
                                         onChange={(e) => setFormData({...formData, specialty: e.target.value})}
                                         required
                                     >
-                                        <option value=""hidden>Επιλέξτε Ειδικότητα</option>
+                                        <option value="" hidden>Επιλέξτε Ειδικότητα</option>
                                         <option value="Μπάρμαν">Μπάρμαν</option>
                                         <option value="Σερβιτόρος">Σερβιτόρος</option>
                                         <option value="Μάγειρας">Μάγειρας</option>
@@ -242,7 +225,8 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
               <button className="close-modal" onClick={() => setShowQR(false)}>×</button>
               <h3>Σκανάρετε για κινητό</h3>
               <div className="qr-code-container">
-                <QRCodeSVG value={`http://${serverIP}:3000`} size={200} />
+                {/* 🚀 ΔΙΟΡΘΩΣΗ: Χρήση του δυναμικού mobileLink αντί για καρφωμένο :3000 */}
+                <QRCodeSVG value={mobileLink} size={200} />
               </div>
               <p>Ανοίξτε την κάμερα του κινητού σας για να συνεχίσετε την εμπειρία φορητά.</p>
             </div>
@@ -272,15 +256,13 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
           </div>
         </div>
       </div>
-      {/* DASHBOARD MODAL: ΕΚΤΟΣ ΤΟΥ CARD ΓΙΑ ΝΑ ΜΗΝ ΠΕΡΙΟΡΙΖΕΤΑΙ ΑΠΟ ΤΟ OVERFLOW */}
+
       {showDashboard && (
         <Dashboard 
           data={allResults} 
           onClose={() => setShowDashboard(false)} 
         />
       )}
-
-
     </div>
   );
 };
